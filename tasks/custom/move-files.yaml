@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: move-files
+  namespace: default
+spec:
+  workspaces:
+    - name: source
+    - name: destination
+  params:
+    - name: source-files
+      type: array
+      default:
+        - "*"
+    - name: source-dir
+      type: string
+      default: ""
+    - name: destination-dir
+      type: string
+      default: ""
+    - name: destination-branch
+      type: string
+      default: main
+    - name: commit-message
+      type: string
+      default: "commit from tekton pipeline"
+    - name: GIT_USER_EMAIL
+      type: string
+      default: <>
+    - name: GIT_USER_NAME
+      type: string
+      default: tekton-automation
+  steps:
+    - name: copy-files-to-destination
+      image: alpine
+      args: ["$(params.source-files[*])"]
+      workingDir: $(workspaces.source.path)/$(params.source-dir)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        destination="$(workspaces.destination.path)/$(params.destination-dir)"
+        mkdir -p "$destination"
+        cp -r ${@} "$destination"
+    - name: commit-to-destination
+      image: alpine/git
+      workingDir: $(workspaces.destination.path)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        git config --global user.email "$(params.GIT_USER_EMAIL)"
+        git config --global user.name "$(params.GIT_USER_NAME)"
+        git config --global --add safe.directory /workspace/destination
+        git fetch origin
+        git checkout -B $(params.destination-branch)
+        git add .
+        git commit -m "$(params.commit-message)"
+        git push -f -u origin $(params.destination-branch)

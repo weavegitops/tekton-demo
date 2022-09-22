@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: helm-release
+  namespace: default
+spec:
+  workspaces:
+    - name: source
+    - name: gh-pages
+  params:
+    - name: chart-path
+      type: string
+    - name: version
+      type: string
+    - name: repo-url
+      type: string
+    - name: release-message
+      type: string
+      default: release new helm chart
+    - name: GIT_USER_EMAIL
+      type: string
+      default: <>
+    - name: GIT_USER_NAME
+      type: string
+      default: tekton-automation
+  steps:
+    - name: package
+      image: alpine/helm
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env sh
+        helm package $(params.chart-path) --version $(params.version) --app-version $(params.version)
+    - name: index
+      image: alpine/helm
+      workingDir: $(workspaces.gh-pages.path)
+      script: |
+        #!/usr/bin/env sh
+        cp $(workspaces.source.path)/*.tgz .
+        helm repo index --url $(params.repo-url) --merge index.yaml .
+    - name: release
+      image: alpine/git
+      workingDir: $(workspaces.gh-pages.path)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        git config --global user.email "$(params.GIT_USER_EMAIL)"
+        git config --global user.name "$(params.GIT_USER_NAME)"
+        git config --global --add safe.directory /workspace/gh-pages
+        git add .
+        git commit -m "$(params.release-message)"
+        git push

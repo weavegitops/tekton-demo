@@ -1,0 +1,33 @@
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Provider
+metadata:
+  name: sample-cd-environment-promotion
+  namespace: default
+spec:
+  type: generic
+  address: http://el-wego-pipeline-environment-promotion.flux-system.svc:8080 # Tekton Event Listener url
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Alert
+metadata:
+  name: sample-app-event-alerts
+  namespace: default
+spec:
+  providerRef: 
+    name: sample-cd-environment-promotion
+  eventSeverity: info
+  eventSources:
+    - kind: HelmRelease
+      namespace: dev
+      name: demo
+    - kind: HelmRelease
+      namespace: staging
+      name: demo
+    - kind: HelmRelease
+      namespace: prod
+      name: demo
+  exclusionList:  # filter out events that should not trigger a pipeline run
+    - ".*upgrade.*has.*started"
+    - ".*not.*ready"
+    - "^Dependencies.*"

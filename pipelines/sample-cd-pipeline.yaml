@@ -1,0 +1,155 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: wego-pipeline-environment-promotion
+  namespace: flux-system
+spec:
+  params:
+    - name: revision
+      type: string
+    - name: source-git-url
+      type: string
+    - name: source-git-revision
+      type: string
+      default: main
+    - name: source-git-directory
+      type: string
+      default: ""
+    - name: source-git-files
+      type: array
+      default:
+        - "*"
+    - name: destination-git-url
+      type: string
+    - name: destination-git-full-name
+      type: string
+    - name: destination-git-directory
+      type: string
+      default: ""
+    - name: destination-git-revision
+      type: string
+      default: main
+    - name: promotion-namespace
+      type: string
+  workspaces:
+    - name: shared-data
+  tasks:
+    - name: clone-source
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.source-git-url)
+        - name: revision
+          value: $(params.source-git-revision)
+      workspaces:
+        - name: output
+          workspace: shared-data
+          subPath: source 
+    - name: clone-destination
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.destination-git-url)
+        - name: revision
+          value: $(params.destination-git-revision)
+      workspaces:
+        - name: output
+          workspace: shared-data
+          subPath: destination
+    - name: set-chart-version
+      taskRef:
+        name: yq
+      runAfter:
+        - clone-source
+        - clone-destination
+      params:
+        - name: args
+          value:
+            - '.spec.chart.spec.version="$(params.revision)"'
+            - -i
+            - ./$(params.source-git-directory)/release.yaml
+      workspaces:
+        - name: source
+          workspace: shared-data
+          subPath: source
+    - name: set-chart-namespace
+      taskRef:
+        name: yq
+      runAfter:
+        - set-chart-version
+      params:
+        - name: args
+          value:
+            - '.metadata.namespace="$(params.promotion-namespace)"'
+            - -i
+            - ./$(params.source-git-directory)/release.yaml
+      workspaces:
+        - name: source
+          workspace: shared-data
+          subPath: source
+    - name: set-chart-repository-namespace
+      taskRef:
+        name: yq
+      runAfter:
+        - set-chart-namespace
+      params:
+        - name: args
+          value:
+            - '.metadata.namespace="$(params.promotion-namespace)"'
+            - -i
+            - ./$(params.source-git-directory)/repository.yaml
+      workspaces:
+        - name: source
+          workspace: shared-data
+          subPath: source
+    - name: copy-files-to-destination
+      taskRef:
+        name: move-files
+      runAfter:
+        - set-chart-version
+        - set-chart-namespace
+        - set-chart-repository-namespace
+      params:
+        - name: source-files
+          value: ["$(params.source-git-files[*])"]
+        - name: source-dir
+          value: $(params.source-git-directory)
+        - name: destination-dir
+          value: $(params.destination-git-directory)
+        - name: destination-branch
+          value: $(params.revision)-$(params.destination-git-directory)
+      workspaces:
+        - name: source
+          workspace: shared-data
+          subPath: source
+        - name: destination
+          workspace: shared-data
+          subPath: destination
+    #
+    # automatically create a pull-request for the release.
+    # if you are deploying to an environment that does not
+    # require review before deploying you can remove this step
+    #
+    - name: open-pr
+      taskRef:
+        name: github-open-pr
+        kind: ClusterTask
+      runAfter:
+        - copy-files-to-destination
+      params:
+        - name: REPO_FULL_NAME
+          value: $(params.destination-git-full-name)
+        - name: HEAD
+          value: $(params.revision)-$(params.destination-git-directory)
+        - name: BASE
+          value: $(params.destination-git-revision)
+        - name: TITLE
+          value: release $(params.revision) to $(params.promotion-namespace)
+        - name: BODY
+          value: release $(params.revision) to $(params.promotion-namespace)
+        - name: GITHUB_TOKEN_SECRET_NAME
+          value: github-api-token

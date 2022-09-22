@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample-cd-triggers-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sample-cd-triggers-sa-rolebinding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: sample-cd-triggers-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-roles
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sample-cd-triggers-sa-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: sample-cd-triggers-sa
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-clusterroles
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: sample-cd-event-listener
+  namespace: default
+spec:
+  triggers:
+    - name: dev-deployment
+      interceptors:
+        - name: "ignore failed releases" # we only want to promote the deployment if the release was successful
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: "body.severity != 'error'"
+        - name: "only listen to dev events" # on successful dev deployments, promote to staging
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: "body.involvedObject.namespace == 'dev'"
+      bindings:
+        - ref: sample-cd-pipeline-trigger-binding
+        - name: source-git-directory
+          value: dev/helm
+        - name: destination-git-directory
+          value: staging/helm
+        - name: promotion-namespace
+          value: staging
+      template:
+        ref: sample-cd-pipeline-trigger-template
+    - name: staging-deployment
+      interceptors:
+        - name: "ignore failed releases"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: "body.severity != 'error'"
+        - name: "only listen to staging events" # on successful staging deployments, promote to prod
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: "body.involvedObject.namespace == 'staging'"
+      bindings:
+        - ref: sample-cd-pipeline-trigger-binding
+        - name: source-git-directory
+          value: staging/helm
+        - name: destination-git-directory
+          value: prod/helm
+        - name: promotion-namespace
+          value: prod
+      template:
+        ref: sample-cd-pipeline-trigger-template
+  resources:
+    kubernetesResource:
+      spec:
+        template:
+          spec:
+            serviceAccountName: sample-cd-triggers-sa # <--IMPORTANT that this matches service account name created at top of this file
+            containers:
+              - resources:
+                  requests:
+                    memory: 64Mi
+                    cpu: 250m
+                  limits:
+                    memory: 64Mi
+                    cpu: 250m

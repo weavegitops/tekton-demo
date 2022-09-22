@@ -1,0 +1,69 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: sample-cd-pipeline-trigger-template
+  namespace: default
+spec:
+  params:
+    - name: revision
+    - name: source-git-url
+    - name: source-git-directory
+    - name: destination-git-url
+    - name: destination-git-full-name
+    - name: destination-git-directory
+    - name: promotion-namespace
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: wego-pipeline-environment-promotion-run-
+      spec:
+        serviceAccountName: build-bot
+        pipelineRef:
+          name: wego-pipeline-environment-promotion
+        params:
+          - name: revision
+            value: $(tt.params.revision)
+          - name: source-git-url
+            value: $(tt.params.source-git-url)
+          - name: source-git-directory
+            value: $(tt.params.source-git-directory)
+          - name: destination-git-url
+            value: $(tt.params.destination-git-url)
+          - name: destination-git-full-name
+            value: $(tt.params.destination-git-full-name)
+          - name: destination-git-directory
+            value: $(tt.params.destination-git-directory)
+          - name: promotion-namespace
+            value: $(tt.params.promotion-namespace)
+        workspaces:
+          - name: shared-data
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: wego-pipeline-environment-promotion-binding
+  namespace: default
+spec:
+  params:
+    - name: source-git-url
+      value: <REPLACE ME>
+    - name: destination-git-url
+      value: <REPLACE ME>
+    - name: destination-git-full-name
+      value: <REPLACE ME>
+    - name: revision
+      value: $(body.metadata.revision)
+    - name: kind
+      value: $(body.involvedObject.kind)
+    - name: name
+      value: $(body.involvedObject.name)
+    - name: namespace
+      value: $(body.involvedObject.namespace)
