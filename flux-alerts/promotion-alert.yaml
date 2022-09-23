@@ -6,7 +6,7 @@ metadata:
   namespace: default
 spec:
   type: generic
-  address: http://el-wego-pipeline-environment-promotion.flux-system.svc:8080 # Tekton Event Listener url
+  address: http://el-sample-cd-event-listener.default.svc:8080 # Tekton Event Listener serivce url
 ---
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
@@ -27,7 +27,7 @@ spec:
     - kind: HelmRelease
       namespace: prod
       name: demo
-  exclusionList:  # filter out events that should not trigger a pipeline run
+  exclusionList:  # filter out intermediary events that should not trigger a pipeline run
     - ".*upgrade.*has.*started"
     - ".*not.*ready"
     - "^Dependencies.*"

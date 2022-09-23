@@ -1,3 +1,36 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample-cd-pipeline-sa # service account to be used during pipeline run
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-bot
+secrets:
+  - name: basic-user-pass
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-user-pass
+  annotations:
+    tekton.dev/git-0: https://github.com # Tekton auth convention
+type: kubernetes.io/basic-auth
+stringData:
+  username: token
+  password: ""
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-api-token
+type: Opaque
+stringData:
+  token: ""
+---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
@@ -16,11 +49,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: wego-pipeline-environment-promotion-run-
+        generateName: sample-cd-pipeline-run- # create unique name automatically
       spec:
-        serviceAccountName: build-bot
+        serviceAccountName: sample-cd-pipeline-sa
         pipelineRef:
-          name: wego-pipeline-environment-promotion
+          name: sample-cd-pipeline
         params:
           - name: revision
             value: $(tt.params.revision)
@@ -49,7 +82,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: wego-pipeline-environment-promotion-binding
+  name: sample-cd-pipeline-trigger-binding
   namespace: default
 spec:
   params:
