@@ -38,7 +38,7 @@ metadata:
   namespace: default
 spec:
   triggers:
-    - name: dev-deployment
+    - name: promote-dev-to-staging
       interceptors:
         - name: "ignore failed releases" # we only want to promote the deployment if the release was successful
           ref:
@@ -62,7 +62,7 @@ spec:
           value: staging
       template:
         ref: sample-cd-pipeline-trigger-template
-    - name: staging-deployment
+    - name: promote-staging-to-prod
       interceptors:
         - name: "ignore failed releases"
           ref:

@@ -86,7 +86,7 @@ spec:
           value:
             - '.metadata.namespace="$(params.promotion-namespace)"'
             - -i
-            - ./$(params.source-git-directory)/release.yaml
+            - ./$(params.source-git-directory)/release.yaml # specific to this demo
       workspaces:
         - name: source
           workspace: shared-data
@@ -101,7 +101,7 @@ spec:
           value:
             - '.metadata.namespace="$(params.promotion-namespace)"'
             - -i
-            - ./$(params.source-git-directory)/repository.yaml
+            - ./$(params.source-git-directory)/repository.yaml # specific to this demo
       workspaces:
         - name: source
           workspace: shared-data

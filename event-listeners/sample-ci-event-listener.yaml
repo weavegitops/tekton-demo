@@ -107,7 +107,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: <REPLACE ME>
+  - host: ${ciEventListenerHost}
     http:
       paths:
       - path: /
