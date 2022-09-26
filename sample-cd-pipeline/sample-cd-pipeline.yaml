@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: sample-cd-pipeline
-  namespace: flux-system
+  namespace: default
 spec:
   params:
     - name: revision

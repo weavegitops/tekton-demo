@@ -57,7 +57,10 @@ spec:
   validation: client
   postBuild:
     substitute:
-      ci-event-listerner-ingress-host: <REPLACE ME>
+      ci_event_listerner_ingress_host: ci-ingress.something.local # replace with your desired ingress url
+      destination_git_url: https://github.com/weavegitops/tekton-demo.git # replace with https url to your forked repo
+      destination_git_full_name: weavegitops/tekton-demo # replace with full name of your forked repo
+      image_name: ghcr.io/weavegitops/tekton-demo # replace with registry url to your forked repo
   #
   # Additonal configuration may be necessary to allow the ci pipeline ingress
   # to work properly in your environment.  If necessary you can either modify
@@ -78,10 +81,10 @@ spec:
   #       spec:
   #         tls:
   #         - hosts:
-  #           - ${ci-event-listerner-ingress-host}
+  #           - ${ci_event_listerner_ingress_host}
   #           secretName: sample-ci-el-ingress-tls
   #         rules:
-  #         - host: ${ci-event-listerner-ingress-host}
+  #         - host: ${ci_event_listerner_ingress_host}
   #     target:
   #       kind: Ingress
   #       name: sample-ci-el-ingress
