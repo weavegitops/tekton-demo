@@ -76,11 +76,11 @@ spec:
 
         # static values passed to TriggerTemplate
         - name: destination-git-url
-          value: ${destination-git-url} # replaced with flux variable substitution
+          value: ${destination_git_url} # replaced with flux variable substitution
         - name: destination-git-full-name
-          value: ${destination-git-full-name}
+          value: ${destination_git_full_name}
         - name: image-name
-          value: ${image-name}
+          value: ${image_name}
         - name: path-to-image-context
           value: ./demo/docker
       template:
@@ -107,7 +107,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: ${ci-event-listerner-ingress-host}
+  - host: ${ci_event_listerner_ingress_host}
     http:
       paths:
       - path: /
