@@ -76,13 +76,13 @@ spec:
 
         # static values passed to TriggerTemplate
         - name: destination-git-url
-          value: <REPLACE ME>
+          value: ${destination-git-url} # replaced with flux variable substitution
         - name: destination-git-full-name
-          value: <REPLACE ME>
+          value: ${destination-git-full-name}
         - name: image-name
-          value: <REPLACE ME>
+          value: ${image-name}
         - name: path-to-image-context
-          value: <REPLACE ME>
+          value: ./demo/docker
       template:
         ref: sample-ci-pipeline-trigger-template
   resources:
@@ -107,7 +107,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: ${ciEventListenerHost}
+  - host: ${ci-event-listerner-ingress-host}
     http:
       paths:
       - path: /

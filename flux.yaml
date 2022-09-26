@@ -1,0 +1,103 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: tekton
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/weavegitops/tekton-demo.git # replace with https url to your forked repo
+  ref:
+    branch: main
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-core
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: tekton
+  path: ./install/core
+  prune: true
+  validation: client
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-tasks
+  namespace: flux-system
+spec:
+  interval: 1m
+  dependsOn:
+    - name: tekton-core
+  sourceRef:
+    kind: GitRepository
+    name: tekton
+  path: ./tasks
+  prune: true
+  validation: client
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: sample-ci-pipeline
+  namespace: flux-system
+spec:
+  interval: 1m
+  dependsOn:
+    - name: tekton-tasks
+  sourceRef:
+    kind: GitRepository
+    name: tekton
+  path: ./sample-ci-pipeline
+  prune: true
+  validation: client
+  postBuild:
+    substitute:
+      ci-event-listerner-ingress-host: <REPLACE ME>
+  #
+  # Additonal configuration may be necessary to allow the ci pipeline ingress
+  # to work properly in your environment.  If necessary you can either modify
+  # the ingress config directly in the sample-ci-event-listener.yaml file or
+  # you can update the config here using kustomize patched.
+  #
+  # Here is an example patch for an ingress that will use letsencrypt for tls
+  #
+  # patches:
+  #   - patch: |-
+  #       apiVersion: networking.k8s.io/v1
+  #       kind: Ingress
+  #       metadata:
+  #         name: sample-ci-el-ingress
+  #         namespace: default
+  #         annotations:
+  #           cert-manager.io/cluster-issuer: letsencrypt
+  #       spec:
+  #         tls:
+  #         - hosts:
+  #           - ${ci-event-listerner-ingress-host}
+  #           secretName: sample-ci-el-ingress-tls
+  #         rules:
+  #         - host: ${ci-event-listerner-ingress-host}
+  #     target:
+  #       kind: Ingress
+  #       name: sample-ci-el-ingress
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: sample-cd-pipeline
+  namespace: flux-system
+spec:
+  interval: 1m
+  dependsOn:
+    - name: tekton-tasks
+  sourceRef:
+    kind: GitRepository
+    name: tekton
+  path: ./sample-cd-pipeline
+  prune: true
+  validation: client

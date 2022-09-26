@@ -6,26 +6,6 @@ metadata:
   namespace: default
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: build-bot
-  namespace: default
-secrets:
-  - name: basic-user-pass
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: basic-user-pass
-  namespace: default
-  annotations:
-    tekton.dev/git-0: https://github.com # Tekton auth convention
-type: kubernetes.io/basic-auth
-stringData:
-  username: token
-  password: ""
----
-apiVersion: v1
 kind: Secret
 metadata:
   name: github-api-token

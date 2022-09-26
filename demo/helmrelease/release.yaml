@@ -8,17 +8,9 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: demo-helmrelease
+      chart: sample-chart
       version: 0.0.1
       sourceRef:
         kind: HelmRepository
         name: weavegitops-tekton-demo
       interval: 1m
-  values:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 64Mi
-      limits:
-        cpu: 100m
-        memory: 64Mi
