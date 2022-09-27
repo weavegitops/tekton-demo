@@ -21,13 +21,11 @@ metadata:
   namespace: default
 spec:
   params:
-    - name: revision
-    - name: source-git-url
-    - name: source-git-directory
-    - name: destination-git-url
-    - name: destination-git-full-name
-    - name: destination-git-directory
-    - name: promotion-namespace
+    - name: chart-version
+    - name: git-url
+    - name: git-full-name
+    - name: release-directory
+    - name: release-file
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -38,20 +36,16 @@ spec:
         pipelineRef:
           name: sample-cd-pipeline
         params:
-          - name: revision
-            value: $(tt.params.revision)
-          - name: source-git-url
-            value: $(tt.params.source-git-url)
-          - name: source-git-directory
-            value: $(tt.params.source-git-directory)
-          - name: destination-git-url
-            value: $(tt.params.destination-git-url)
-          - name: destination-git-full-name
-            value: $(tt.params.destination-git-full-name)
-          - name: destination-git-directory
-            value: $(tt.params.destination-git-directory)
-          - name: promotion-namespace
-            value: $(tt.params.promotion-namespace)
+          - name: chart-version
+            value: $(tt.params.chart-version)
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-full-name
+            value: $(tt.params.git-full-name)
+          - name: release-directory
+            value: $(tt.params.release-directory)
+          - name: release-file
+            value: $(tt.params.release-file)
         workspaces:
           - name: shared-data
             volumeClaimTemplate:
@@ -69,9 +63,5 @@ metadata:
   namespace: default
 spec:
   params:
-    - name: git-url
-      value: <REPLACE ME>
-    - name: git-full-name
-      value: <REPLACE ME>
     - name: chart-version
       value: $(body.metadata.revision)

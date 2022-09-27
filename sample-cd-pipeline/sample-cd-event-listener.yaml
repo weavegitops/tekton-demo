@@ -48,6 +48,10 @@ spec:
               value: "body.severity != 'error'"
       bindings:
         - ref: sample-cd-pipeline-trigger-binding
+        - name: git-url
+          value: ${git_url}
+        - name: git-full-name
+          value: ${git_full_name}
         - name: release-directory
           value: demo/environments/prod
         - name: release-file
