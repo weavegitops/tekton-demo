@@ -51,7 +51,7 @@ spec:
                     storage: 1Gi
           - name: docker-credentials # kubernetes secret reference to docker regisistry creds
             secret:
-              secretName: ghcr-credentials
+              secretName: docker-credentials
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding

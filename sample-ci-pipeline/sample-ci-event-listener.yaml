@@ -80,7 +80,7 @@ spec:
         - name: path-to-image-context
           value: demo/docker
         - name: chart-path
-          value: demo/charts
+          value: demo/charts/sample-chart
       template:
         ref: sample-ci-pipeline-trigger-template
   resources:
