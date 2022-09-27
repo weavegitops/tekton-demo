@@ -58,8 +58,6 @@ spec:
       params:
         - name: files
           value: ["./$(params.release-directory)/$(params.release-file)"]
-        - name: source-dir
-          value: $(params.source-git-directory)
         - name: branch
           value: release-$(params.revision)
       workspaces:
