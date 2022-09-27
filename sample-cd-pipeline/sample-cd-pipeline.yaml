@@ -59,7 +59,7 @@ spec:
         - name: files
           value: ["./$(params.release-directory)/$(params.release-file)"]
         - name: branch
-          value: release-$(params.revision)
+          value: release-$(params.chart-version)
       workspaces:
         - name: source
           workspace: shared-data
