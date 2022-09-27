@@ -1,10 +1,3 @@
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: sample-ci-pipeline-sa # service account to be used during pipeline run
-  namespace: default
----
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
@@ -24,7 +17,7 @@ spec:
       metadata:
         generateName: sample-ci-pipeline-run- # create unique name automatically
       spec:
-        serviceAccountName: sample-ci-pipeline-sa
+        serviceAccountName: sample-pipeline-sa # <-- IMPORTANT make sure this is created before running pipeline (see README)
         pipelineRef:
           name: sample-ci-pipeline
         params:
