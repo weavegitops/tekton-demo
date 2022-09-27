@@ -17,6 +17,7 @@ spec:
     - name: image-name
     - name: path-to-image-context
     - name: tag
+    - name: chart-path
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -27,9 +28,9 @@ spec:
         pipelineRef:
           name: sample-ci-pipeline
         params:
-          - name: source-git-url
+          - name: git-url
             value: $(tt.params.git-url)
-          - name: source-git-revision
+          - name: git-revision
             value: $(tt.params.git-revision)
           - name: image-name
             value: $(tt.params.image-name)
@@ -37,6 +38,8 @@ spec:
             value: $(tt.params.tag)
           - name: path-to-image-context
             value: $(tt.params.path-to-image-context)
+          - name: chart-path
+            value: $(tt.params.chart-path)
         workspaces:
           - name: shared-data # pvc volume definition (used to share data between tasks)
             volumeClaimTemplate:

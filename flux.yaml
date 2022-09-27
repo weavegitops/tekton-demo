@@ -83,6 +83,15 @@ spec:
   #           secretName: sample-ci-el-ingress-tls
   #         rules:
   #         - host: ${ci_event_listerner_ingress_host}
+  #           http:
+  #             paths:
+  #             - path: /
+  #               pathType: Prefix
+  #               backend:
+  #                 service:
+  #                   name: el-sample-ci-event-listener
+  #                   port:
+  #                     name: http-listener
   #     target:
   #       kind: Ingress
   #       name: sample-ci-el-ingress
@@ -106,3 +115,20 @@ spec:
     substitute:
       git_url: https://github.com/weavegitops/tekton-demo.git # replace with https url to your forked repo
       git_full_name: weavegitops/tekton-demo # replace with full name of your forked repo
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: demo
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: tekton-demo
+  path: ./demo/environments
+  prune: true
+  validation: client
+  postBuild:
+    substitute:
+      gh_pages_url: https://weavegitops.github.io/tekton-demo # replace with your gh-pages url

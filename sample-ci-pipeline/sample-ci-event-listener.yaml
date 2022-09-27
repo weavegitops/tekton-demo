@@ -78,7 +78,9 @@ spec:
         - name: image-name
           value: ${image_name}
         - name: path-to-image-context
-          value: ./demo/docker
+          value: demo/docker
+        - name: chart-path
+          value: demo/charts
       template:
         ref: sample-ci-pipeline-trigger-template
   resources:
