@@ -33,6 +33,7 @@ spec:
         set -e
         git config --global user.email "$(params.GIT_USER_EMAIL)"
         git config --global user.name "$(params.GIT_USER_NAME)"
+        git config --global --add safe.directory /workspace/source
         git fetch origin
         git checkout -B $(params.branch)
         git add ${@}
