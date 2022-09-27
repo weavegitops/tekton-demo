@@ -11,6 +11,7 @@ spec:
     - name: path-to-image-context
     - name: tag
     - name: chart-path
+    - name: gh-pages-url
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -33,6 +34,8 @@ spec:
             value: $(tt.params.path-to-image-context)
           - name: chart-path
             value: $(tt.params.chart-path)
+          - name: gh-pages-url
+            value: $(tt.params.gh-pages-url)
         workspaces:
           - name: shared-data # pvc volume definition (used to share data between tasks)
             volumeClaimTemplate:

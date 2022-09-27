@@ -12,7 +12,7 @@ spec:
       type: string
     - name: version
       type: string
-    - name: repo-url
+    - name: pages-url
       type: string
     - name: release-message
       type: string
@@ -36,7 +36,7 @@ spec:
       script: |
         #!/usr/bin/env sh
         cp $(workspaces.source.path)/*.tgz .
-        helm repo index --url $(params.repo-url) --merge index.yaml .
+        helm repo index --url $(params.pages-url) --merge index.yaml .
     - name: release
       image: alpine/git
       workingDir: $(workspaces.gh-pages.path)

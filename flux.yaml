@@ -59,6 +59,7 @@ spec:
     substitute:
       ci_event_listerner_ingress_host: ci-ingress.something.local # replace with your desired ingress url
       image_name: ghcr.io/weavegitops/tekton-demo # replace with registry url to your forked repo
+      gh_pages_url: https://weavegitops.github.io/tekton-demo # replace with your gh-pages url
   #
   # Additonal configuration may be necessary to allow the ci pipeline ingress
   # to work properly in your environment.  If necessary you can either modify

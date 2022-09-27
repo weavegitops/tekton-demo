@@ -35,4 +35,4 @@ metadata:
 type: Opaque
 stringData:
   config.json: |
-    '{"auths":{"ghcr.io":{"username":"token","password":"'$GITHUB_API_TOKEN'"}}}'
+    {"auths":{"ghcr.io":{"username":"token","password":"$GITHUB_API_TOKEN"}}}

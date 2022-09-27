@@ -79,8 +79,8 @@ spec:
           value: $(params.chart-path)
         - name: version
           value: $(params.tag)
-        - name: repo-url
-          value: $(params.git-url)
+        - name: pages-url
+          value: $(params.gh-pages-url)
       runAfter:
         - build-image
       workspaces:

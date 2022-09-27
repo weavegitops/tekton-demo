@@ -81,6 +81,8 @@ spec:
           value: demo/docker
         - name: chart-path
           value: demo/charts/sample-chart
+        - name: gh-pages-url
+          value: ${gh_pages_url}
       template:
         ref: sample-ci-pipeline-trigger-template
   resources:
