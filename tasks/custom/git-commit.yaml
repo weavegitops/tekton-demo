@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-commit
+  namespace: default
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: files
+      type: array
+      default:
+        - "."
+    - name: branch
+      type: string
+      default: main
+    - name: message
+      type: string
+      default: "commit from tekton pipeline"
+    - name: GIT_USER_EMAIL
+      type: string
+      default: <>
+    - name: GIT_USER_NAME
+      type: string
+      default: tekton-automation
+  steps:
+    - name: commit-to-destination
+      image: alpine/git
+      args: ["$(params.files[*])"]
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        git config --global user.email "$(params.GIT_USER_EMAIL)"
+        git config --global user.name "$(params.GIT_USER_NAME)"
+        git fetch origin
+        git checkout -B $(params.branch)
+        git add ${@}
+        git commit -m "$(params.message)"
+        git push -f -u origin $(params.branch)

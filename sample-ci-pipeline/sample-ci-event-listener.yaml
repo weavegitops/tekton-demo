@@ -75,10 +75,6 @@ spec:
         - ref: github-tag-binding
 
         # static values passed to TriggerTemplate
-        - name: destination-git-url
-          value: ${destination_git_url} # replaced with flux variable substitution
-        - name: destination-git-full-name
-          value: ${destination_git_full_name}
         - name: image-name
           value: ${image_name}
         - name: path-to-image-context

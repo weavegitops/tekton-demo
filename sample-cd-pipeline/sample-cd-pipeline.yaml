@@ -5,31 +5,19 @@ metadata:
   namespace: default
 spec:
   params:
-    - name: revision
+    - name: chart-version
       type: string
-    - name: source-git-url
+    - name: git-url
       type: string
-    - name: source-git-revision
+    - name: git-full-name
       type: string
-      default: main
-    - name: source-git-directory
-      type: string
-      default: ""
-    - name: source-git-files
-      type: array
-      default:
-        - "*"
-    - name: destination-git-url
-      type: string
-    - name: destination-git-full-name
-      type: string
-    - name: destination-git-directory
-      type: string
-      default: ""
-    - name: destination-git-revision
+    - name: git-revision
       type: string
       default: main
-    - name: promotion-namespace
+    - name: release-directory
+      type: string
+      default: ""
+    - name: release-file
       type: string
   workspaces:
     - name: shared-data
@@ -40,95 +28,44 @@ spec:
         kind: ClusterTask
       params:
         - name: url
-          value: $(params.source-git-url)
+          value: $(params.git-url)
         - name: revision
-          value: $(params.source-git-revision)
+          value: $(params.git-revision)
       workspaces:
         - name: output
           workspace: shared-data
           subPath: source 
-    - name: clone-destination
-      taskRef:
-        name: git-clone
-        kind: ClusterTask
-      params:
-        - name: url
-          value: $(params.destination-git-url)
-        - name: revision
-          value: $(params.destination-git-revision)
-      workspaces:
-        - name: output
-          workspace: shared-data
-          subPath: destination
     - name: set-chart-version
       taskRef:
         name: yq
       runAfter:
         - clone-source
-        - clone-destination
       params:
         - name: args
           value:
-            - '.spec.chart.spec.version="$(params.revision)"'
+            - '.spec.chart.spec.version="$(params.chart-version)"'
             - -i
-            - ./$(params.source-git-directory)/release.yaml
+            - ./$(params.release-directory)/$(params.release-file)
       workspaces:
         - name: source
           workspace: shared-data
           subPath: source
-    - name: set-chart-namespace
+    - name: commit
       taskRef:
-        name: yq
+        name: git-commit
       runAfter:
         - set-chart-version
       params:
-        - name: args
-          value:
-            - '.metadata.namespace="$(params.promotion-namespace)"'
-            - -i
-            - ./$(params.source-git-directory)/release.yaml # specific to this demo
-      workspaces:
-        - name: source
-          workspace: shared-data
-          subPath: source
-    - name: set-chart-repository-namespace
-      taskRef:
-        name: yq
-      runAfter:
-        - set-chart-namespace
-      params:
-        - name: args
-          value:
-            - '.metadata.namespace="$(params.promotion-namespace)"'
-            - -i
-            - ./$(params.source-git-directory)/repository.yaml # specific to this demo
-      workspaces:
-        - name: source
-          workspace: shared-data
-          subPath: source
-    - name: copy-files-to-destination
-      taskRef:
-        name: move-files
-      runAfter:
-        - set-chart-version
-        - set-chart-namespace
-        - set-chart-repository-namespace
-      params:
-        - name: source-files
-          value: ["$(params.source-git-files[*])"]
+        - name: files
+          value: ["./$(params.release-directory)/$(params.release-file)"]
         - name: source-dir
           value: $(params.source-git-directory)
-        - name: destination-dir
-          value: $(params.destination-git-directory)
-        - name: destination-branch
-          value: $(params.revision)-$(params.destination-git-directory)
+        - name: branch
+          value: release-$(params.revision)
       workspaces:
         - name: source
           workspace: shared-data
           subPath: source
-        - name: destination
-          workspace: shared-data
-          subPath: destination
     #
     # automatically create a pull-request for the release.
     # if you are deploying to an environment that does not
@@ -139,17 +76,17 @@ spec:
         name: github-open-pr
         kind: ClusterTask
       runAfter:
-        - copy-files-to-destination
+        - commit
       params:
         - name: REPO_FULL_NAME
-          value: $(params.destination-git-full-name)
+          value: $(params.git-full-name)
         - name: HEAD
-          value: $(params.revision)-$(params.destination-git-directory)
+          value: release-$(params.chart-version)
         - name: BASE
-          value: $(params.destination-git-revision)
+          value: $(params.git-revision)
         - name: TITLE
-          value: release $(params.revision) to $(params.promotion-namespace)
+          value: release $(params.chart-version)
         - name: BODY
-          value: release $(params.revision) to $(params.promotion-namespace)
+          value: release $(params.chart-version)
         - name: GITHUB_TOKEN_SECRET_NAME
           value: github-api-token

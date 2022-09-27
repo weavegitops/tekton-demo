@@ -63,8 +63,8 @@ spec:
           value: $(params.path-to-image-context)
         - name: DOCKERFILE
           value: $(params.path-to-dockerfile)
-      runAfter: # ensures tasks run in correct order
-        - clone-source
+      runAfter:
+        - clone-source # ensures tasks run in correct order
       workspaces:
         - name: source
           workspace: shared-data

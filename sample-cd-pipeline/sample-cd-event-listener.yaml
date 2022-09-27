@@ -38,31 +38,7 @@ metadata:
   namespace: default
 spec:
   triggers:
-    - name: promote-dev-to-staging
-      interceptors:
-        - name: "ignore failed releases" # we only want to promote the deployment if the release was successful
-          ref:
-            name: cel
-          params:
-            - name: filter
-              value: "body.severity != 'error'"
-        - name: "only listen to dev events" # on successful dev deployments, promote to staging
-          ref:
-            name: cel
-          params:
-            - name: filter
-              value: "body.involvedObject.namespace == 'dev'"
-      bindings:
-        - ref: sample-cd-pipeline-trigger-binding
-        - name: source-git-directory
-          value: dev/helm
-        - name: destination-git-directory
-          value: staging/helm
-        - name: promotion-namespace
-          value: staging
-      template:
-        ref: sample-cd-pipeline-trigger-template
-    - name: promote-staging-to-prod
+    - name: promote-to-prod
       interceptors:
         - name: "ignore failed releases"
           ref:
@@ -70,20 +46,12 @@ spec:
           params:
             - name: filter
               value: "body.severity != 'error'"
-        - name: "only listen to staging events" # on successful staging deployments, promote to prod
-          ref:
-            name: cel
-          params:
-            - name: filter
-              value: "body.involvedObject.namespace == 'staging'"
       bindings:
         - ref: sample-cd-pipeline-trigger-binding
-        - name: source-git-directory
-          value: staging/helm
-        - name: destination-git-directory
-          value: prod/helm
-        - name: promotion-namespace
-          value: prod
+        - name: release-directory
+          value: demo/environments/prod
+        - name: release-file
+          value: release.yaml
       template:
         ref: sample-cd-pipeline-trigger-template
   resources:

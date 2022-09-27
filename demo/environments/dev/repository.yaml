@@ -1,0 +1,9 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: weavegitops-tekton-demo
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  url: https://weavegitops.github.io/tekton-demo # replace with your gh-pages url

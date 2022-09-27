@@ -18,14 +18,16 @@ spec:
     name: sample-cd-environment-promotion
   eventSeverity: info
   eventSources:
-    - kind: HelmRelease
-      namespace: dev
-      name: demo
+    #
+    # the dev and staging environments are configured to look deploy new helm versions
+    # automatically based on semver range patterns. for prod we want to use a specific
+    # version and we want to update it ONLY if the staging release was successful.
+    # 
+    # this will trigger an alert on changes to the demo HelmRelease object in the
+    # staging environment (namespace)
+    # 
     - kind: HelmRelease
       namespace: staging
-      name: demo
-    - kind: HelmRelease
-      namespace: prod
       name: demo
   exclusionList:  # filter out intermediary events that should not trigger a pipeline run
     - ".*upgrade.*has.*started"

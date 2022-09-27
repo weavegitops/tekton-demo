@@ -14,8 +14,6 @@ spec:
   params: # any params that need to be passed into the pipeline must also be declared here
     - name: git-url
     - name: git-revision
-    - name: destination-git-url
-    - name: destination-git-full-name
     - name: image-name
     - name: path-to-image-context
     - name: tag
@@ -33,10 +31,6 @@ spec:
             value: $(tt.params.git-url)
           - name: source-git-revision
             value: $(tt.params.git-revision)
-          - name: destination-git-url
-            value: $(tt.params.destination-git-url)
-          - name: destination-git-full-name
-            value: $(tt.params.destination-git-full-name)
           - name: image-name
             value: $(tt.params.image-name)
           - name: tag
@@ -52,7 +46,7 @@ spec:
                 resources:
                   requests:
                     storage: 1Gi
-          - name: docker-credentials # kubernetes secret reference
+          - name: docker-credentials # kubernetes secret reference to docker regisistry creds
             secret:
               secretName: ghcr-credentials
 ---

@@ -69,17 +69,9 @@ metadata:
   namespace: default
 spec:
   params:
-    - name: source-git-url
+    - name: git-url
       value: <REPLACE ME>
-    - name: destination-git-url
+    - name: git-full-name
       value: <REPLACE ME>
-    - name: destination-git-full-name
-      value: <REPLACE ME>
-    - name: revision
+    - name: chart-version
       value: $(body.metadata.revision)
-    - name: kind
-      value: $(body.involvedObject.kind)
-    - name: name
-      value: $(body.involvedObject.name)
-    - name: namespace
-      value: $(body.involvedObject.namespace)
