@@ -4,7 +4,7 @@ metadata:
   name: demo
   namespace: prod
 spec:
-  interval: 5m
+  interval: 1m
   chart:
     spec:
       chart: sample-chart
@@ -13,3 +13,6 @@ spec:
         kind: HelmRepository
         name: tekton-demo
       interval: 1m
+  values:
+    image:
+      repository: ${image_name} # replaced by flux using post build substitution

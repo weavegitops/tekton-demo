@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-pipeline-config
+  namespace: flux-system # this will be used by flux for post build substitutions
+data:
+  #
+  # replace all these values with your forked repo settings
+  # and ingress settings for ci pipeline webhook
+  #
+  git_url: https://github.com/weavegitops/tekton-demo.git
+  git_full_name: weavegitops/tekton-demo
+  gh_pages_url: https://weavegitops.github.io/tekton-demo
+  image_name: ghcr.io/weavegitops/tekton-demo
+  ci_event_listerner_ingress_host: ci-ingress.something.local

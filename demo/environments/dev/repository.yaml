@@ -4,5 +4,5 @@ metadata:
   name: tekton-demo
   namespace: dev
 spec:
-  interval: 5m
-  url: ${gh_pages_url}
+  interval: 1m
+  url: ${gh_pages_url} # replaced by flux using post build substitution

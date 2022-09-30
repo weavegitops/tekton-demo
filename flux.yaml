@@ -56,10 +56,9 @@ spec:
   prune: true
   validation: client
   postBuild:
-    substitute:
-      ci_event_listerner_ingress_host: ci-ingress.something.local # replace with your desired ingress url
-      image_name: ghcr.io/weavegitops/tekton-demo # replace with registry url to your forked repo
-      gh_pages_url: https://weavegitops.github.io/tekton-demo # replace with your gh-pages url
+    substituteFrom:
+      - kind: ConfigMap
+        name: sample-pipeline-config
   #
   # Additonal configuration may be necessary to allow the ci pipeline ingress
   # to work properly in your environment.  If necessary you can either modify
@@ -113,9 +112,9 @@ spec:
   prune: true
   validation: client
   postBuild:
-    substitute:
-      git_url: https://github.com/weavegitops/tekton-demo.git # replace with https url to your forked repo
-      git_full_name: weavegitops/tekton-demo # replace with full name of your forked repo
+    substituteFrom:
+      - kind: ConfigMap
+        name: sample-pipeline-config
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -131,5 +130,6 @@ spec:
   prune: true
   validation: client
   postBuild:
-    substitute:
-      gh_pages_url: https://weavegitops.github.io/tekton-demo # replace with your gh-pages url
+    substituteFrom:
+      - kind: ConfigMap
+        name: sample-pipeline-config
