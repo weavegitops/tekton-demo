@@ -25,7 +25,6 @@ spec:
     - name: clone-source
       taskRef:
         name: git-clone
-        kind: ClusterTask
       params:
         - name: url
           value: $(params.git-url)
@@ -72,7 +71,6 @@ spec:
     - name: open-pr
       taskRef:
         name: github-open-pr
-        kind: ClusterTask
       runAfter:
         - commit
       params:
