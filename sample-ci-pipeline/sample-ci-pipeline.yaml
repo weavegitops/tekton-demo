@@ -22,6 +22,8 @@ spec:
     - name: path-to-dockerfile
       type: string
       default: ./Dockerfile
+    - name: gh-pages-url
+      type: string
     - name: gh-pages-branch
       type: string
       default: gh-pages
@@ -82,6 +84,7 @@ spec:
         - name: pages-url
           value: $(params.gh-pages-url)
       runAfter:
+        - clone-gh-pages
         - build-image
       workspaces:
         - name: source
