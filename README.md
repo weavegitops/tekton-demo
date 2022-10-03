@@ -1,7 +1,12 @@
 # tekton-demo
 
 ## Getting Started
+### Fork and Configure Repo
 Before getting started it is important to fork this project into your own repo.  There are permission and access requirements that need to be configured that will not be possible without using your own forked version.
+
+***Make sure to uncheck `only main` when you fork.***  We'll be using gh-pages to host our helm repository and this project already has an empty `gh-pages` branch created that we will use.
+
+After forking you will want to verify that GitHub Pages is enabled on the repo.  Go to `settings > Pages` and verify that pages are set to `Deploy from a branch` and that branch is configured to the root of the `gh-pages` branch.
 
 ### Install Flux
 If Flux is not already installed on your cluster, you will want to bootstrap it as documented [here](https://fluxcd.io/flux/installation/#bootstrap).  Alternatively you can do a [dev install](https://fluxcd.io/flux/installation/#dev-install) as well.
