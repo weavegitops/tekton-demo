@@ -2,11 +2,11 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
-  name: tekton
+  name: tekton-demo
   namespace: flux-system
 spec:
   interval: 1m
-  url: https://github.com/weavegitops/tekton-demo.git # replace with https url to your forked repo
+  url: https://github.com/weavegitops/tekton-demo.git # IMPORTANT replace with https url to your forked repo
   ref:
     branch: main
 ---
@@ -19,7 +19,7 @@ spec:
   interval: 1m
   sourceRef:
     kind: GitRepository
-    name: tekton
+    name: tekton-demo
   path: ./install/core
   prune: true
   validation: client
@@ -35,7 +35,7 @@ spec:
     - name: tekton-core
   sourceRef:
     kind: GitRepository
-    name: tekton
+    name: tekton-demo
   path: ./tasks
   prune: true
   validation: client
@@ -51,7 +51,7 @@ spec:
     - name: tekton-tasks
   sourceRef:
     kind: GitRepository
-    name: tekton
+    name: tekton-demo
   path: ./sample-ci-pipeline
   prune: true
   validation: client
@@ -75,7 +75,7 @@ spec:
   #         name: sample-ci-el-ingress
   #         namespace: default
   #         annotations:
-  #           cert-manager.io/cluster-issuer: letsencrypt
+  #           cert-manager.io/cluster-issuer: letsencrypt-prod
   #       spec:
   #         tls:
   #         - hosts:
@@ -107,7 +107,7 @@ spec:
     - name: tekton-tasks
   sourceRef:
     kind: GitRepository
-    name: tekton
+    name: tekton-demo
   path: ./sample-cd-pipeline
   prune: true
   validation: client

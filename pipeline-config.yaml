@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sample-pipeline-config
-  namespace: flux-system # this will be used by flux for post build substitutions
+  namespace: flux-system # this will be used by flux for post build substitutions - DO NOT CHANGE THIS
 data:
   #
   # replace all these values with your forked repo settings
